@@ -1,125 +1,60 @@
-require('dotenv').config();
-const express = require('express');
+const { readFileSync } = require('fs');
 const path = require('path');
-const cors = require('cors');
-const fs = require('fs');
 
-const app = express();
-const PORT = process.env.PORT || 8080;
-
-// Add detailed error logging
-console.log('Starting server...');
-console.log(`Node environment: ${process.env.NODE_ENV}`);
-console.log(`Current directory: ${__dirname}`);
-
-// Enable CORS with more options
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Parse JSON bodies with size limit
-app.use(express.json({ limit: '10mb' }));
-
-// Set proper MIME types
-app.use((req, res, next) => {
-  console.log(`Request received: ${req.method} ${req.path}`);
-  const ext = path.extname(req.path).toLowerCase();
-  if (ext === '.css') {
-    res.type('text/css');
-  } else if (ext === '.js') {
-    res.type('application/javascript');
-  } else if (ext === '.html') {
-    res.type('text/html');
-  }
-  next();
-});
-
-// Serve static files from public directory with explicit caching
-app.use(express.static(path.join(__dirname, '..'), {
-  maxAge: '1h',
-  setHeaders: (res, filePath) => {
-    if (path.extname(filePath) === '.html') {
-      // No cache for HTML files
-      res.setHeader('Cache-Control', 'no-cache');
-    }
-  }
-}));
-
-// Explicit routes for static files with error handling
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'), err => {
-    if (err) {
-      console.error('Error sending index.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-app.get('/script.js', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'script.js'), err => {
-    if (err) {
-      console.error('Error sending script.js:', err);
-      res.status(500).send('Error loading script');
-    }
-  });
-});
-
-app.get('/styles.css', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'styles.css'), err => {
-    if (err) {
-      console.error('Error sending styles.css:', err);
-      res.status(500).send('Error loading styles');
-    }
-  });
-});
-
-// Serve the Web Worker file
-app.get('/csvWorker.js', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'csvWorker.js'), err => {
-    if (err) {
-      console.error('Error sending csvWorker.js:', err);
-      res.status(500).send('Error loading worker script');
-    }
-  });
-});
-
-// API endpoint to get configuration
-app.get('/api/config', (req, res) => {
+module.exports = (req, res) => {
   try {
-    // Read from .env file or use defaults
-    const config = {
-      apiVersion: process.env.API_VERSION || 'test',
-      apiToken: process.env.API_TOKEN || '',
-      apiKey: process.env.API_KEY || ''
-    };
-    res.json(config);
+    // Log the request
+    console.log(`Request received: ${req.method} ${req.url}`);
+    
+    // Serve index.html for the root path
+    if (req.url === '/' || req.url === '') {
+      const indexPath = path.join(__dirname, '..', 'index.html');
+      const content = readFileSync(indexPath, 'utf8');
+      res.setHeader('Content-Type', 'text/html');
+      return res.end(content);
+    }
+    
+    // Serve script.js
+    if (req.url === '/script.js') {
+      const scriptPath = path.join(__dirname, '..', 'script.js');
+      const content = readFileSync(scriptPath, 'utf8');
+      res.setHeader('Content-Type', 'application/javascript');
+      return res.end(content);
+    }
+    
+    // Serve styles.css
+    if (req.url === '/styles.css') {
+      const stylePath = path.join(__dirname, '..', 'styles.css');
+      const content = readFileSync(stylePath, 'utf8');
+      res.setHeader('Content-Type', 'text/css');
+      return res.end(content);
+    }
+    
+    // Serve csvWorker.js
+    if (req.url === '/csvWorker.js') {
+      const workerPath = path.join(__dirname, '..', 'public', 'csvWorker.js');
+      const content = readFileSync(workerPath, 'utf8');
+      res.setHeader('Content-Type', 'application/javascript');
+      return res.end(content);
+    }
+    
+    // API endpoint for configuration
+    if (req.url === '/api/config') {
+      const config = {
+        apiVersion: process.env.API_VERSION || 'test',
+        apiToken: process.env.API_TOKEN || '',
+        apiKey: process.env.API_KEY || ''
+      };
+      res.setHeader('Content-Type', 'application/json');
+      return res.end(JSON.stringify(config));
+    }
+    
+    // 404 for everything else
+    res.statusCode = 404;
+    return res.end('Not Found');
   } catch (error) {
-    console.error('Error getting config:', error);
-    res.status(500).json({ error: 'Failed to get configuration' });
+    console.error('Server error:', error);
+    res.statusCode = 500;
+    return res.end('Internal Server Error');
   }
-});
-
-// Error handling for 404
-app.use((req, res, next) => {
-  console.log(`404 Not Found: ${req.method} ${req.path}`);
-  res.status(404).send('Not Found');
-});
-
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).send('Internal Server Error');
-});
-
-// For Vercel serverless functions
-module.exports = app;
-
-// Start the server if not running in a serverless environment
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Access the app at http://localhost:${PORT}`);
-  });
-} 
+}; 
