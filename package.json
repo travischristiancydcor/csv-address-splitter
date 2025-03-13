@@ -1,7 +1,7 @@
 {
-  "name": "csv-address-splitter",
+  "name": "csv-map-visualizer",
   "version": "1.0.0",
-  "description": "A tool to split street addresses in CSV files",
+  "description": "A tool to visualize CSV location data on Google Maps",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -15,5 +15,17 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
-  }
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "keywords": [
+    "csv",
+    "google-maps",
+    "visualization",
+    "location-data",
+    "marker-clustering"
+  ],
+  "author": "",
+  "license": "MIT"
 } 

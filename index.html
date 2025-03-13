@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Address Splitter</title>
+    <title>CSV Map Visualizer</title>
     <!-- Preconnect to external domains for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
             color: #333;
         }
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
         }
@@ -57,22 +57,51 @@
             font-size: 14px;
             font-weight: 500;
         }
+        #map {
+            height: 600px;
+            width: 100%;
+            border-radius: 8px;
+        }
+        .view-toggle {
+            display: flex;
+            margin-bottom: 16px;
+        }
+        .view-toggle button {
+            flex: 1;
+            margin: 0 4px;
+        }
+        .view-toggle button.active {
+            background-color: #1d4ed8;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .filter-controls input {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>CSV Address Splitter</h1>
-        <p>Upload a CSV file to split the 'street__c' column into 'Street #' and 'Street Name'.</p>
+        <h1>CSV Map Visualizer</h1>
+        <p>Upload a CSV file to visualize location data on Google Maps.</p>
         
         <div class="card api-config">
-            <h3>API Configuration</h3>
+            <h3>Google Maps API Configuration</h3>
             <div class="form-group">
-                <label for="apiVersion">API Version</label>
-                <input type="text" id="apiVersion" value="test" />
+                <label for="apiKey">Google Maps API Key</label>
+                <input type="password" id="apiKey" value="" placeholder="Enter your Google Maps API Key" />
             </div>
             <div class="form-group">
-                <label for="apiToken">API Token</label>
-                <input type="password" id="apiToken" value="" placeholder="Token will be loaded from server" />
+                <button id="saveApiKey"><i class="fas fa-save button-icon"></i>Save API Key</button>
             </div>
         </div>
         
@@ -109,14 +138,58 @@
             </div>
         </div>
         
-        <div id="results" class="hidden card">
-            <h2>Processing Results</h2>
-            <div id="preview"></div>
-            <div id="uploadStatus" class="hidden"></div>
+        <div id="mapFieldsCard" class="hidden card">
+            <h3>Map CSV Fields</h3>
+            <p>Select which columns from your CSV file contain the latitude and longitude data.</p>
+            
+            <div class="form-group">
+                <label for="latField">Latitude Field</label>
+                <select id="latField" class="field-select"></select>
+            </div>
+            
+            <div class="form-group">
+                <label for="lngField">Longitude Field</label>
+                <select id="lngField" class="field-select"></select>
+            </div>
+            
+            <div class="form-group">
+                <label for="titleField">Title Field (Optional)</label>
+                <select id="titleField" class="field-select">
+                    <option value="">-- None --</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button id="visualizeBtn"><i class="fas fa-map-marked-alt button-icon"></i>Visualize on Map</button>
+            </div>
+        </div>
+        
+        <div id="resultsContainer" class="hidden">
+            <div class="view-toggle">
+                <button id="listViewBtn" class="active"><i class="fas fa-list button-icon"></i>List View</button>
+                <button id="mapViewBtn"><i class="fas fa-map button-icon"></i>Map View</button>
+            </div>
+            
+            <div class="card">
+                <div class="filter-controls">
+                    <input type="text" id="searchFilter" placeholder="Search records..." />
+                    <button id="filterBtn"><i class="fas fa-filter button-icon"></i>Filter</button>
+                </div>
+                
+                <div id="listView">
+                    <div id="preview"></div>
+                </div>
+                
+                <div id="mapView" class="hidden">
+                    <div id="map"></div>
+                </div>
+            </div>
         </div>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js" integrity="sha512-4vP4cPGNIy5+WiqSQQq3EhQzCcjicHtna/h2qHTvuEdgsOGUwD9c88iJKUYsIqEMfDnpyf6lrS9lbO9W/guLdg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- MarkerClusterer library for handling large datasets -->
+    <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
     <script src="/script.js"></script>
 </body>
 </html> 

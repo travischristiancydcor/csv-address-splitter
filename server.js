@@ -48,100 +48,72 @@ app.use(express.static(path.join(__dirname, 'public'), {
 }));
 
 // Explicit routes for static files with error handling
-app.get('/styles.css', (req, res) => {
-  try {
-    const filePath = path.join(__dirname, 'public', 'styles.css');
-    if (fs.existsSync(filePath)) {
-      res.sendFile(filePath);
-    } else {
-      console.error(`styles.css not found at ${filePath}`);
-      res.status(404).send('CSS file not found');
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'), err => {
+    if (err) {
+      console.error('Error sending index.html:', err);
+      res.status(500).send('Error loading page');
     }
-  } catch (error) {
-    console.error('Error serving styles.css:', error);
-    res.status(500).send('Internal server error');
-  }
+  });
 });
 
 app.get('/script.js', (req, res) => {
-  try {
-    const filePath = path.join(__dirname, 'public', 'script.js');
-    if (fs.existsSync(filePath)) {
-      res.sendFile(filePath);
-    } else {
-      console.error(`script.js not found at ${filePath}`);
-      res.status(404).send('JavaScript file not found');
+  res.sendFile(path.join(__dirname, 'script.js'), err => {
+    if (err) {
+      console.error('Error sending script.js:', err);
+      res.status(500).send('Error loading script');
     }
-  } catch (error) {
-    console.error('Error serving script.js:', error);
-    res.status(500).send('Internal server error');
-  }
+  });
 });
 
-// API endpoint to get config with improved error handling
+app.get('/styles.css', (req, res) => {
+  res.sendFile(path.join(__dirname, 'styles.css'), err => {
+    if (err) {
+      console.error('Error sending styles.css:', err);
+      res.status(500).send('Error loading styles');
+    }
+  });
+});
+
+// Serve the Web Worker file
+app.get('/csvWorker.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'csvWorker.js'), err => {
+    if (err) {
+      console.error('Error sending csvWorker.js:', err);
+      res.status(500).send('Error loading worker script');
+    }
+  });
+});
+
+// API endpoint to get configuration
 app.get('/api/config', (req, res) => {
   try {
-    // Get API token and version from environment variables with fallbacks
-    const apiToken = process.env.BUBBLE_API_TOKEN || '9d68fe22933950e82082ce92b10ca711';
-    const apiVersion = process.env.BUBBLE_API_VERSION || 'test';
-    
-    console.log(`API config requested. Using version: ${apiVersion}`);
-    console.log(`Token length: ${apiToken.length} characters`);
-    
-    res.json({
-      apiToken: apiToken,
-      apiVersion: apiVersion
-    });
+    // Read from .env file or use defaults
+    const config = {
+      apiVersion: process.env.API_VERSION || 'test',
+      apiToken: process.env.API_TOKEN || ''
+    };
+    res.json(config);
   } catch (error) {
-    console.error('Error in /api/config endpoint:', error);
-    res.status(500).json({ error: 'Internal server error', message: error.message });
+    console.error('Error getting config:', error);
+    res.status(500).json({ error: 'Failed to get configuration' });
   }
 });
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// Serve index.html for all other routes with improved error handling
-app.get('*', (req, res) => {
-  try {
-    console.log(`Serving index.html for path: ${req.path}`);
-    const indexPath = path.join(__dirname, 'public', 'index.html');
-    
-    // Check if the file exists
-    if (fs.existsSync(indexPath)) {
-      console.log(`index.html found at ${indexPath}`);
-      res.sendFile(indexPath);
-    } else {
-      console.error(`Index file not found at ${indexPath}`);
-      // Try to list the directory contents for debugging
-      try {
-        const dirContents = fs.readdirSync(path.join(__dirname, 'public'));
-        console.error(`Directory contents: ${dirContents.join(', ')}`);
-      } catch (dirError) {
-        console.error(`Could not read directory: ${dirError.message}`);
-      }
-      res.status(404).send('File not found');
-    }
-  } catch (error) {
-    console.error('Error serving index.html:', error);
-    res.status(500).send('Internal server error: ' + error.message);
-  }
+// Error handling for 404
+app.use((req, res, next) => {
+  console.log(`404 Not Found: ${req.method} ${req.path}`);
+  res.status(404).send('Not Found');
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-  res.status(500).send('Something broke!');
+  console.error('Server error:', err);
+  res.status(500).send('Internal Server Error');
 });
 
-// For Vercel serverless functions, we need to export the app
-module.exports = app;
-
-// Only start the server if not running in a serverless environment
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-} 
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Access the app at http://localhost:${PORT}`);
+}); 

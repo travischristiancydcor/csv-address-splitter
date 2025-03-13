@@ -1,96 +1,109 @@
-# CSV Address Splitter & Lead Uploader
+# CSV Map Visualizer
 
-A web application that processes CSV files containing address data, splits street addresses into separate components, and uploads the processed data to a Bubble.io database.
+A web application that allows users to upload CSV files containing location data and visualize them on Google Maps. The application is designed to handle large datasets (7,000 - 50,000 records) efficiently using marker clustering and web workers.
 
 ## Features
 
-- **CSV Processing**: Upload and parse CSV files with automatic street address splitting
-- **Data Preview**: View processed data before uploading
-- **Bubble.io Integration**: Direct upload to Bubble.io database via API
-- **Field Mapping**: Map CSV columns to Bubble.io database fields
-- **Territory Management**: Create territories and link them to uploaded leads
-- **Batch Processing**: Handle large datasets with configurable batch sizes
-- **Admin Settings**: Customize API endpoints, field configurations, and default values
+- Upload and parse CSV files with location data
+- Map CSV fields to latitude and longitude coordinates
+- Visualize locations on Google Maps with marker clustering
+- Toggle between list and map views
+- Filter and search records
+- View detailed information by clicking on markers
+- Optimized for large datasets using web workers and marker clustering
 
-## Getting Started
-
-### Prerequisites
+## Requirements
 
 - Node.js (v12 or higher)
-- npm or yarn
+- Google Maps API key with the following enabled services:
+  - Maps JavaScript API
+  - Geocoding API (optional, if addresses need to be converted to coordinates)
 
-### Installation
+## Installation
 
 1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/csv-address-splitter.git
-   cd csv-address-splitter
-   ```
+```bash
+git clone <repository-url>
+cd csv-map-visualizer
+```
 
 2. Install dependencies:
-   ```
-   npm install
-   ```
+```bash
+npm install
+```
 
-3. Create a `.env` file in the root directory with your Bubble.io API credentials:
-   ```
-   BUBBLE_API_TOKEN=your_api_token
-   BUBBLE_API_VERSION=your_api_version
-   ```
+3. Create a `.env` file in the root directory with your Google Maps API key:
+```
+API_KEY=your_google_maps_api_key
+```
 
-4. Start the development server:
-   ```
-   npm run dev
-   ```
+4. Start the server:
+```bash
+npm start
+```
 
 5. Open your browser and navigate to `http://localhost:8080`
 
 ## Usage
 
-1. **Upload a CSV File**: Drag and drop or click to select a CSV file
-2. **Process the File**: Click "Process CSV" to parse and split address data
-3. **Select Territory** (Optional): Choose an ICL and Zip Code Assignment to create a territory
-4. **Map Fields**: Click "Upload to Database" to map CSV columns to database fields
-5. **Upload Data**: Confirm the mapping to upload data to Bubble.io
+### 1. Configure Google Maps API
 
-## Configuration
+- Enter your Google Maps API key in the configuration section
+- Click "Save API Key" to store it in your browser's local storage
 
-### Admin Settings
+### 2. Upload CSV File
 
-The application includes an admin panel for customizing:
+- Click the upload area or drag and drop a CSV file
+- The file should contain columns with latitude and longitude data
+- Maximum file size: 10MB
 
-- API endpoint URL
-- Batch size for API requests
-- Default values for Status and Lead Source
-- Field configurations (ID, label, required status)
+### 3. Process CSV Data
 
-Settings are saved to localStorage and persist between sessions.
+- Click "Process CSV" to parse the file
+- The application will display a preview of the data
 
-## Deployment
+### 4. Map CSV Fields
 
-The application is deployed using Vercel. To deploy your own instance:
+- Select which columns contain latitude and longitude data
+- Optionally select a column to use as the marker title
+- The application will attempt to auto-detect common field names
 
-1. Install Vercel CLI:
-   ```
-   npm install -g vercel
-   ```
+### 5. Visualize on Map
 
-2. Deploy to Vercel:
-   ```
-   vercel --prod
-   ```
+- Click "Visualize on Map" to display the data on Google Maps
+- The application will process the data in batches using a web worker
+- Markers will be clustered for better performance with large datasets
 
-## Built With
+### 6. Interact with the Map
 
-- Express.js - Web server framework
-- PapaParse - CSV parsing library
-- Vercel - Deployment platform
+- Toggle between list and map views
+- Filter records using the search box
+- Click on markers to view detailed information
+- Zoom and pan the map to explore the data
+
+## Performance Optimization
+
+The application includes several optimizations for handling large datasets:
+
+- **Web Workers**: CSV processing is offloaded to a separate thread to prevent UI freezing
+- **Batch Processing**: Data is processed and rendered in batches
+- **Marker Clustering**: Markers are clustered to improve rendering performance
+- **Lazy Loading**: Only visible markers are rendered
+
+## Browser Compatibility
+
+The application works best in modern browsers:
+- Chrome (recommended)
+- Firefox
+- Safari
+- Edge
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT
 
-## Acknowledgments
+## Acknowledgements
 
-- Bubble.io for their API
-- PapaParse for CSV parsing capabilities 
+- [Google Maps JavaScript API](https://developers.google.com/maps/documentation/javascript/overview)
+- [PapaParse](https://www.papaparse.com/) for CSV parsing
+- [MarkerClusterer](https://github.com/googlemaps/js-markerclusterer) for marker clustering 
