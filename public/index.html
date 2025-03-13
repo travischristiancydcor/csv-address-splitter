@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Address Splitter</title>
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <!-- Load fonts and icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Load local styles -->
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Fallback styles in case the external CSS doesn't load */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #f9fafb;
+            cursor: pointer;
+            margin-bottom: 24px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CSV Address Splitter</h1>
+        <p>Upload a CSV file to split the 'street__c' column into 'Street #' and 'Street Name'.</p>
+        
+        <div class="card api-config">
+            <h3>API Configuration</h3>
+            <div class="form-group">
+                <label for="apiVersion">API Version</label>
+                <input type="text" id="apiVersion" value="test" />
+            </div>
+            <div class="form-group">
+                <label for="apiToken">API Token</label>
+                <input type="password" id="apiToken" value="" placeholder="Token will be loaded from server" />
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>Upload Files</h3>
+            <div class="upload-area" id="dropZone">
+                <i class="fas fa-cloud-upload-alt upload-icon" style="font-size: 48px;"></i>
+                <p class="upload-text">Drag & drop or click to choose files</p>
+                <div class="info-text">
+                    <i class="fas fa-info-circle info-icon"></i>
+                    <span>Max file size: 10 MB</span>
+                </div>
+                <input type="file" id="csvFile" accept=".csv" style="display: none;" />
+            </div>
+            
+            <div id="fileInfo" class="hidden file-info">
+                <i class="fas fa-file-csv file-icon" style="font-size: 24px;"></i>
+                <div class="file-details">
+                    <div class="file-name" id="fileName">filename.csv</div>
+                    <div class="file-size" id="fileSize">0 KB</div>
+                </div>
+                <div class="file-actions">
+                    <button class="secondary" id="downloadBtn" title="Download"><i class="fas fa-download button-icon"></i></button>
+                    <button class="danger" id="removeBtn" title="Remove"><i class="fas fa-trash button-icon"></i></button>
+                </div>
+            </div>
+            
+            <div id="progressContainer" class="hidden">
+                <div id="progressBar"></div>
+            </div>
+            
+            <div class="button-group">
+                <button id="processBtn"><i class="fas fa-cogs button-icon"></i>Process CSV</button>
+            </div>
+        </div>
+        
+        <div id="results" class="hidden card">
+            <h2>Processing Results</h2>
+            <div id="preview"></div>
+            <div id="uploadStatus" class="hidden"></div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/script.js"></script>
+</body>
+</html> 
