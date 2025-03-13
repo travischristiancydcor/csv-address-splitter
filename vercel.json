@@ -38,10 +38,5 @@
   ],
   "env": {
     "API_KEY": "${API_KEY}"
-  },
-  "functions": {
-    "server.js": {
-      "includeFiles": "node_modules/**"
-    }
   }
 } 
