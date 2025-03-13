@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
+      "src": "api/index.js",
       "use": "@vercel/node"
     },
     {
@@ -13,7 +13,7 @@
   "routes": [
     {
       "src": "/",
-      "dest": "/server.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/styles.css",
@@ -29,14 +29,19 @@
     },
     {
       "src": "/api/(.*)",
-      "dest": "/server.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "/api/index.js"
     }
   ],
   "env": {
     "API_KEY": "${API_KEY}"
+  },
+  "functions": {
+    "server.js": {
+      "includeFiles": "node_modules/**"
+    }
   }
 } 
