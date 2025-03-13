@@ -37,7 +37,7 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from public directory with explicit caching
-app.use(express.static(path.join(__dirname, '..', 'public'), {
+app.use(express.static(path.join(__dirname, '..'), {
   maxAge: '1h',
   setHeaders: (res, filePath) => {
     if (path.extname(filePath) === '.html') {
@@ -91,7 +91,8 @@ app.get('/api/config', (req, res) => {
     // Read from .env file or use defaults
     const config = {
       apiVersion: process.env.API_VERSION || 'test',
-      apiToken: process.env.API_TOKEN || ''
+      apiToken: process.env.API_TOKEN || '',
+      apiKey: process.env.API_KEY || ''
     };
     res.json(config);
   } catch (error) {
