@@ -12,6 +12,10 @@
   ],
   "routes": [
     {
+      "src": "/",
+      "dest": "/server.js"
+    },
+    {
       "src": "/styles.css",
       "dest": "/styles.css"
     },
