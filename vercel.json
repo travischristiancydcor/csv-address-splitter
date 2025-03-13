@@ -13,11 +13,15 @@
   "routes": [
     {
       "src": "/styles.css",
-      "dest": "/public/styles.css"
+      "dest": "/styles.css"
     },
     {
       "src": "/script.js",
-      "dest": "/public/script.js"
+      "dest": "/script.js"
+    },
+    {
+      "src": "/csvWorker.js",
+      "dest": "/public/csvWorker.js"
     },
     {
       "src": "/api/(.*)",
@@ -27,5 +31,8 @@
       "src": "/(.*)",
       "dest": "/server.js"
     }
-  ]
+  ],
+  "env": {
+    "API_KEY": "@google_maps_api_key"
+  }
 } 
