@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Map Visualizer</title>
+    <title>myT Lead Manager</title>
     <!-- Preconnect to external domains for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,23 +87,25 @@
             border: 1px solid #d1d5db;
             border-radius: 6px;
         }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        .admin-content {
+            display: none;
+        }
+        .admin-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>CSV Map Visualizer</h1>
+        <h1>myT Lead Manager</h1>
         <p>Upload a CSV file to visualize location data on Google Maps.</p>
-        
-        <div class="card api-config">
-            <h3>Google Maps API Configuration</h3>
-            <div class="form-group">
-                <label for="apiKey">Google Maps API Key</label>
-                <input type="password" id="apiKey" value="" placeholder="Enter your Google Maps API Key" />
-            </div>
-            <div class="form-group">
-                <button id="saveApiKey"><i class="fas fa-save button-icon"></i>Save API Key</button>
-            </div>
-        </div>
         
         <div class="card">
             <h3>Upload Files</h3>
@@ -135,6 +137,29 @@
             
             <div class="button-group">
                 <button id="processBtn"><i class="fas fa-cogs button-icon"></i>Process CSV</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="admin-header" id="adminHeader">
+                <h3>Admin Settings</h3>
+                <i class="fas fa-chevron-down" id="adminToggleIcon"></i>
+            </div>
+            <div class="admin-content" id="adminContent">
+                <div class="form-group">
+                    <label for="apiKey">Google Maps API Key</label>
+                    <input type="password" id="apiKey" value="" placeholder="Enter your Google Maps API Key" />
+                </div>
+                <div class="form-group">
+                    <button id="saveApiKey"><i class="fas fa-save button-icon"></i>Save API Key</button>
+                </div>
+                
+                <!-- Additional admin settings can be added here -->
+                <div class="form-group">
+                    <label for="batchSize">Processing Batch Size</label>
+                    <input type="number" id="batchSize" value="1000" min="100" max="5000" />
+                    <p class="info-text"><i class="fas fa-info-circle info-icon"></i>Number of records to process in each batch (lower for slower devices)</p>
+                </div>
             </div>
         </div>
         

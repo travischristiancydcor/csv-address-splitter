@@ -388,4 +388,34 @@ tr:hover {
         width: 100%;
         margin-bottom: 8px;
     }
+}
+
+/* Admin settings styles */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 16px;
+}
+
+.admin-header h3 {
+    margin: 0;
+}
+
+.admin-content {
+    display: none;
+    padding-top: 8px;
+}
+
+.admin-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 } 

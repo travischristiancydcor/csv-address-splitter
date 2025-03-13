@@ -25,8 +25,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const mapView = document.getElementById('mapView');
     const searchFilter = document.getElementById('searchFilter');
     const filterBtn = document.getElementById('filterBtn');
+    
+    // Admin settings elements
+    const adminHeader = document.getElementById('adminHeader');
+    const adminContent = document.getElementById('adminContent');
+    const adminToggleIcon = document.getElementById('adminToggleIcon');
     const apiKeyInput = document.getElementById('apiKey');
     const saveApiKeyBtn = document.getElementById('saveApiKey');
+    const batchSizeInput = document.getElementById('batchSize');
     
     // State variables
     let csvData = null;
@@ -36,11 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let markerCluster = null;
     let infoWindow = null;
     let apiKey = localStorage.getItem('googleMapsApiKey') || '';
+    let batchSize = parseInt(localStorage.getItem('batchSize')) || 1000;
     
     // Constants
     const DEFAULT_CENTER = { lat: 37.7749, lng: -122.4194 }; // San Francisco
     const DEFAULT_ZOOM = 10;
-    const BATCH_SIZE = 1000; // Number of records to process in each batch
     
     // Initialize the application
     init();
@@ -68,16 +74,43 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // Admin settings event listeners
+        adminHeader.addEventListener('click', toggleAdminSettings);
+        
         // API Key handling
         if (apiKey) {
             apiKeyInput.value = apiKey;
         }
         
+        // Batch size handling
+        if (batchSize) {
+            batchSizeInput.value = batchSize;
+        }
+        
         saveApiKeyBtn.addEventListener('click', () => {
             apiKey = apiKeyInput.value.trim();
+            batchSize = parseInt(batchSizeInput.value) || 1000;
+            
             localStorage.setItem('googleMapsApiKey', apiKey);
-            alert('API Key saved successfully!');
+            localStorage.setItem('batchSize', batchSize);
+            
+            alert('Settings saved successfully!');
         });
+    }
+    
+    /**
+     * Toggle admin settings panel
+     */
+    function toggleAdminSettings() {
+        adminContent.classList.toggle('active');
+        
+        if (adminContent.classList.contains('active')) {
+            adminToggleIcon.classList.remove('fa-chevron-down');
+            adminToggleIcon.classList.add('fa-chevron-up');
+        } else {
+            adminToggleIcon.classList.remove('fa-chevron-up');
+            adminToggleIcon.classList.add('fa-chevron-down');
+        }
     }
     
     /**
@@ -122,6 +155,52 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.files.length) {
             handleFileSelect(e.target.files[0]);
         }
+    }
+    
+    /**
+     * Handle file selection
+     * @param {File} file - The selected file
+     */
+    function handleFileSelect(file) {
+        // Check if it's a CSV file
+        if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+            alert('Please select a CSV file.');
+            return;
+        }
+        
+        // Check file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File size exceeds the 10MB limit.');
+            return;
+        }
+        
+        // Update UI
+        csvData = file;
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.classList.remove('hidden');
+        
+        // Reset other UI elements
+        previewDiv.innerHTML = '';
+        progressContainer.classList.add('hidden');
+        progressBar.style.width = '0%';
+        mapFieldsCard.classList.add('hidden');
+        resultsContainer.classList.add('hidden');
+    }
+    
+    /**
+     * Format file size in human-readable format
+     * @param {number} bytes - The file size in bytes
+     * @returns {string} - Formatted file size
+     */
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
     
     /**
@@ -304,6 +383,9 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {Object} mappings - Field mappings
      */
     function processDataWithWorker(data, mappings) {
+        // Get current batch size from input
+        const currentBatchSize = parseInt(batchSizeInput.value) || 1000;
+        
         // Create a web worker
         const worker = new Worker('/csvWorker.js');
         
@@ -311,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
         worker.postMessage({
             data: data,
             mappings: mappings,
-            batchSize: BATCH_SIZE
+            batchSize: currentBatchSize
         });
         
         // Initialize markers array
@@ -378,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function initMap() {
         // Check if API key is available
         if (!apiKey) {
-            alert('Please enter a Google Maps API Key in the configuration section.');
+            alert('Please enter a Google Maps API Key in the Admin Settings section.');
             hideLoadingOverlay();
             return;
         }
